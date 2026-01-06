@@ -1,87 +1,87 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>gozone.Site | AI Image Generator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>gozone.Site | AI Image Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #ffffff;
-      text-align: center;
-    }
+<style>
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:linear-gradient(135deg,#020617,#020617,#020617);
+  color:#fff;
+  text-align:center;
+}
 
-    header {
-      padding: 20px;
-      background: #020617;
-      box-shadow: 0 0 10px rgba(0,0,0,0.6);
-    }
+header{
+  padding:25px;
+}
 
-    h1 {
-      margin: 5px 0;
-      color: #38bdf8;
-    }
+h1{
+  color:#38bdf8;
+  margin:0;
+}
 
-    p {
-      color: #cbd5f5;
-    }
+.box{
+  max-width:420px;
+  margin:30px auto;
+  background:#020617;
+  padding:25px;
+  border-radius:14px;
+  box-shadow:0 0 20px rgba(0,0,0,0.7);
+}
 
-    .box {
-      margin: 30px auto;
-      max-width: 400px;
-      background: #020617;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.7);
-    }
+input{
+  width:90%;
+  padding:12px;
+  border-radius:8px;
+  border:none;
+  outline:none;
+  font-size:16px;
+}
 
-    input {
-      width: 90%;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      margin-bottom: 10px;
-      font-size: 16px;
-    }
+button{
+  margin-top:12px;
+  padding:12px 25px;
+  border:none;
+  border-radius:8px;
+  background:#38bdf8;
+  color:#020617;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    button {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      background: #38bdf8;
-      color: #020617;
-      font-size: 16px;
-      cursor: pointer;
-      font-weight: bold;
-    }
+button:hover{
+  background:#0ea5e9;
+}
 
-    button:hover {
-      background: #0ea5e9;
-    }
+#loading{
+  margin-top:15px;
+  display:none;
+  color:#94a3b8;
+}
 
-    img {
-      margin-top: 20px;
-      max-width: 100%;
-      border-radius: 10px;
-      display: none;
-    }
+#resultPage{
+  display:none;
+  margin-top:30px;
+}
 
-    footer {
-      margin-top: 40px;
-      padding: 15px;
-      font-size: 14px;
-      color: #94a3b8;
-    }
+img{
+  max-width:90%;
+  border-radius:12px;
+  margin-top:15px;
+}
 
-    a {
-      color: #38bdf8;
-      text-decoration: none;
-    }
-  </style>
+footer{
+  margin-top:40px;
+  font-size:14px;
+  color:#94a3b8;
+}
+a{color:#38bdf8;text-decoration:none;}
+</style>
 </head>
 
 <body>
@@ -91,40 +91,59 @@
   <p>AI Text to Image Generator</p>
 </header>
 
-<div class="box">
+<div class="box" id="inputPage">
   <h3>Enter any text 👇</h3>
-  <input type="text" id="prompt" placeholder="DOG, CAT, AI ROBOT...">
+  <input id="prompt" placeholder="DOG, CAT, AI ROBOT">
   <br>
   <button onclick="generate()">Generate Image</button>
+  <div id="loading">Generating image, please wait...</div>
+</div>
 
-  <img id="result">
+<!-- RESULT PAGE -->
+<div id="resultPage">
+  <h2>Generated Image</h2>
+  <img id="finalImage">
+  <br><br>
+  <button onclick="goBack()">Generate Another</button>
 </div>
 
 <footer>
-  <p>
-    Created by <b>Gaurav Kumar (Gaurav Rockn 😁)</b><br>
-    Instagram: 
-    <a href="https://instagram.com/gozone.Site" target="_blank">
-      @gozone.Site
-    </a>
-  </p>
+  Instagram: <a href="https://instagram.com/gozone.Site" target="_blank">@gozone.Site</a>
 </footer>
 
 <script>
-  function generate() {
-    let text = document.getElementById("prompt").value;
-    let img = document.getElementById("result");
-
-    if (text.trim() === "") {
-      alert("Please enter some text");
-      return;
-    }
-
-    img.style.display = "block";
-    img.src =
-      "https://all-type-photo-gen.onrender.com/api/generate?img=" +
-      encodeURIComponent(text);
+function generate(){
+  let text=document.getElementById("prompt").value.trim();
+  if(text===""){
+    alert("Please enter text");
+    return;
   }
+
+  document.getElementById("loading").style.display="block";
+
+  fetch("https://all-type-photo-gen.onrender.com/api/generate?img="+encodeURIComponent(text))
+    .then(res=>res.json())
+    .then(data=>{
+      document.getElementById("loading").style.display="none";
+
+      if(data.status==="success" && data.image_link){
+        document.getElementById("inputPage").style.display="none";
+        document.getElementById("resultPage").style.display="block";
+        document.getElementById("finalImage").src=data.image_link;
+      }else{
+        alert("Image generation failed");
+      }
+    })
+    .catch(()=>{
+      document.getElementById("loading").style.display="none";
+      alert("API error, try again");
+    });
+}
+
+function goBack(){
+  document.getElementById("resultPage").style.display="none";
+  document.getElementById("inputPage").style.display="block";
+}
 </script>
 
 </body>
