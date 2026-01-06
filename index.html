@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>gozone.Site | AI Image Generator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{margin:0;font-family:Arial;background:#020617;color:#fff;text-align:center}
+header{padding:25px}
+h1{color:#38bdf8}
+.box{max-width:420px;margin:30px auto;background:#020617;padding:25px;
+border-radius:14px;box-shadow:0 0 20px rgba(0,0,0,.7)}
+input{width:90%;padding:12px;border-radius:8px;border:none;font-size:16px}
+button{margin-top:12px;padding:12px 25px;border:none;border-radius:8px;
+background:#38bdf8;color:#020617;font-size:16px;font-weight:bold}
+#loading{display:none;color:#94a3b8;margin-top:10px}
+#result{display:none;margin-top:20px}
+img{max-width:90%;border-radius:12px}
+footer{margin-top:40px;font-size:14px;color:#94a3b8}
+a{color:#38bdf8;text-decoration:none}
+</style>
+</head>
+
+<body>
+<header>
+<h1>gozone.Site</h1>
+<p>AI Text to Image Generator</p>
+</header>
+
+<div class="box">
+<input id="prompt" placeholder="DOG, CAT, AI ROBOT">
+<br>
+<button onclick="generate()">Generate Image</button>
+<div id="loading">Generating...</div>
+
+<div id="result">
+<img id="img">
+</div>
+</div>
+
+<footer>
+Instagram: <a href="https://instagram.com/gozone.Site" target="_blank">@gozone.Site</a>
+</footer>
+
+<script>
+function generate(){
+ const text=document.getElementById("prompt").value.trim();
+ if(!text){alert("Enter text");return;}
+ document.getElementById("loading").style.display="block";
+ fetch("/.netlify/functions/generate?img="+encodeURIComponent(text))
+ .then(r=>r.json())
+ .then(d=>{
+   document.getElementById("loading").style.display="none";
+   if(d.status==="success"){
+     document.getElementById("img").src=d.image_link;
+     document.getElementById("result").style.display="block";
+   }else alert("Failed");
+ })
+ .catch(()=>{document.getElementById("loading").style.display="none";
+ alert("Server error");});
+}
+</script>
+</body>
+</html>
